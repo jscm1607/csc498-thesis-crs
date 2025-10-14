@@ -1,21 +1,27 @@
+# SECTION 1: BASELINES
+
 import pandas as pd
 import numpy as np
 
-
+# Part 1: Read and clean csv
 df = pd.read_csv(
     "data/spotify_dataset.csv",
-    quotechar='"',    # recognize quotes properly
-    sep=',',          # ensure comma delimiter
-    on_bad_lines='skip',  # skip bad rows instead of crashing (optional)
-    engine='python'   # more forgiving parser than C engine
+    quotechar='"',
+    sep=',',
+    on_bad_lines='skip',
+    engine='python'
 )
 
 #print(df.head())
 #print(df.columns)
 
+# clean headers
 df.columns = df.columns.str.replace('"', '').str.strip()
 
+# create song column combining tracks and artists
 df['song'] = df['trackname'] + ' - ' + df['artistname']
+
+# create playlist list
 playlists = (
     df.groupby('playlistname')['song']
       .apply(list)
@@ -24,9 +30,10 @@ playlists = (
 
 #print(playlists)
 
+# Part 2: Get playlist stats
 num_playlists = len(playlists)
 
-# Remove big playlists -- from max 1.331416e+06 to max 500
+# Remove big playlists -- from max 1331416 to max 500
 playlists = playlists[playlists['song'].apply(len) <= 500]
 
 # Songs per playlist
@@ -45,29 +52,23 @@ print(songs_per_playlist_stats)
 print("\nPlaylists per song:")
 print(playlists_per_song_stats)
 
-# PART 2: BASELINE
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+# PART 3: Create baselines
 import random
 
-# ============================================================
-# 1. LOAD DATA
-# ============================================================
-# Remove missing or malformed entries
+# Get valid data
 df = df.dropna(subset=['playlistname', 'song'])
 
 import ast
 
-# Convert string representation of list to actual list safely
+# String representation of list to actual list
 def safe_parse_list(s):
     if isinstance(s, str):
         s = s.strip()
         if s.startswith('[') and s.endswith(']'):
             try:
-                # Use ast.literal_eval instead of eval
+                # ast.literal_eval
                 return ast.literal_eval(s)
             except Exception:
-                # fallback: treat as single string
                 return [s]
         else:
             # comma-separated string fallback
@@ -77,23 +78,21 @@ def safe_parse_list(s):
     else:
         return []
 
+# Create valid song values
 df['song'] = df['song'].apply(safe_parse_list)
 
-# Filter extreme outliers
+# Filter outliers
 df = df[df['song'].apply(len) <= 500]
 
-# Train/test split (e.g., 95/5%)
-train = df.sample(frac=0.95, random_state=42)
+# Train/test split
+train = df.sample(frac=0.90, random_state=16)
 test = df.drop(train.index)
 
 # Flatten song occurrences for global popularity
 all_songs = [song for songs in train['song'] for song in songs]
 song_counts = pd.Series(all_songs).value_counts()
 
-# ============================================================
-# 2. BASELINE RECOMMENDERS # https://medium.com/@preethi_prakash/understanding-baseline-models-in-machine-learning-3ed94f03d645
-# ============================================================
-
+# BASELINE RECOMMENDERS
 # Random classifier
 def random_recommender(k=10):
     """Recommend k random songs from all training songs."""
@@ -104,10 +103,8 @@ def popularity_recommender(k=10):
     """Recommend top-k globally most frequent songs."""
     return list(song_counts.head(k).index)
 
-# ============================================================
-# 3. EVALUATION
-# ============================================================
-def evaluate_baseline(method_fn, name, k=10, n_samples=200, needs_input=False):
+# EVALUATION
+def evaluate_baseline(method_fn, name, n_samples=500, needs_input=False):
     """Compute how often the recommender picks a song in the test playlist."""
     sample = test.sample(n=min(n_samples, len(test)), random_state=42)
     correct = 0
@@ -123,17 +120,11 @@ def evaluate_baseline(method_fn, name, k=10, n_samples=200, needs_input=False):
             correct += 1
 
     accuracy = correct / len(sample)
-    print(f"{name:<25} Accuracy: {accuracy:.5f}")
+    print(f"{name:<25} Accuracy: {accuracy:.10f}")
     return accuracy
 
-# ============================================================
-# 4. RUN EXPERIMENTS
-# ============================================================
+# RUN
 if __name__ == "__main__":
-    print("\n🎧 Baseline Recommenders Evaluation\n" + "-"*40)
+    print("\nBaseline Recommenders Evaluation\n")
     acc_random = evaluate_baseline(random_recommender, "Random Recommender")
     acc_pop = evaluate_baseline(popularity_recommender, "Popularity Recommender")
-
-    print("\n✅ Done. Results Summary:")
-    print(f"Random: {acc_random:.5f}")
-    print(f"Popularity: {acc_pop:.5f}")
