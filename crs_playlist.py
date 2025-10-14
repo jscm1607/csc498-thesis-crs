@@ -2,6 +2,8 @@
 
 import pandas as pd
 import numpy as np
+import random
+import ast
 
 # Part 1: Read and clean csv
 df = pd.read_csv(
@@ -53,12 +55,8 @@ print("\nPlaylists per song:")
 print(playlists_per_song_stats)
 
 # PART 3: Create baselines
-import random
-
 # Get valid data
 df = df.dropna(subset=['playlistname', 'song'])
-
-import ast
 
 # String representation of list to actual list
 def safe_parse_list(s):
@@ -71,8 +69,9 @@ def safe_parse_list(s):
             except Exception:
                 return [s]
         else:
-            # comma-separated string fallback
+            # comma-separated string
             return [item.strip() for item in s.split(',')]
+    # already in list -- just return
     elif isinstance(s, list):
         return s
     else:
@@ -88,8 +87,8 @@ df = df[df['song'].apply(len) <= 500]
 train = df.sample(frac=0.90, random_state=16)
 test = df.drop(train.index)
 
-# Flatten song occurrences for global popularity
-all_songs = [song for songs in train['song'] for song in songs]
+# Count all instances of songs for popularity rec
+all_songs = train.explode('song')['song'].tolist()
 song_counts = pd.Series(all_songs).value_counts()
 
 # BASELINE RECOMMENDERS
@@ -106,7 +105,7 @@ def popularity_recommender(k=10):
 # EVALUATION
 def evaluate_baseline(method_fn, name, n_samples=500, needs_input=False):
     """Compute how often the recommender picks a song in the test playlist."""
-    sample = test.sample(n=min(n_samples, len(test)), random_state=42)
+    sample = test.sample(n=min(n_samples, len(test)), random_state=16)
     correct = 0
 
     for _, row in sample.iterrows():

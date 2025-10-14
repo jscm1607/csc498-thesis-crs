@@ -35,7 +35,7 @@ max      2.606000e+03
 <br>
 I also implemented two simple baseline recommender to analyze the dataset.<br>
 - Random Recommender: 0% accuracy<br>
-- Popularity Recommender: 0.2% accuracy
+- Popularity Recommender: 0% accuracy
 
 ## References
 * [Understanding Baseline Models in Machine Learning](https://medium.com/@preethi_prakash/understanding-baseline-models-in-machine-learning-3ed94f03d645)
