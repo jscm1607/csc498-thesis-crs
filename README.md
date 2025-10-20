@@ -5,6 +5,14 @@ Author: Jose Santiago Campa Morales ([jscm1607@arizona.edu](mailto:jscm1607@ariz
 Fall 2025 - Spring 2026
 
 ## Notes
+### Section 2
+I will now test on more sophisticated baselines. To start, I found two online: TF-IDF and BM25.
+The BM25 baseline requires to download the rank_bm25 library, so pip install rank_bm25
+
+<br>
+- TF-IDF Recommender: 40% accuracy<br>
+- BM25 Recommender: 41% accuracy
+
 ### Section 1
 I downloaded and formatted a playlist dataset and gathered basic stats.<br>
 I used the [Spotify Playlists](https://www.kaggle.com/datasets/andrewmvd/spotify-playlists)
@@ -39,3 +47,4 @@ I also implemented two simple baseline recommender to analyze the dataset.<br>
 
 ## References
 * [Understanding Baseline Models in Machine Learning](https://medium.com/@preethi_prakash/understanding-baseline-models-in-machine-learning-3ed94f03d645)
+* [TF-IDF vs BM25: Understanding and Implementing Text Ranking Algorithms in Python](https://medium.com/@macikgozm/tf-idf-vs-bm25-understanding-and-implementing-text-ranking-algorithms-in-python-f56111f5086b)
