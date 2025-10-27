@@ -55,3 +55,5 @@ To use BM25, install the package below:<br>
 ## References
 * [Understanding Baseline Models in Machine Learning](https://medium.com/@preethi_prakash/understanding-baseline-models-in-machine-learning-3ed94f03d645)
 * [TF-IDF vs BM25: Understanding and Implementing Text Ranking Algorithms in Python](https://medium.com/@macikgozm/tf-idf-vs-bm25-understanding-and-implementing-text-ranking-algorithms-in-python-f56111f5086b)
+* [What is cosine similarity?](https://www.ibm.com/think/topics/cosine-similarity)
+* [A Dummy’s Guide to Word2Vec](https://medium.com/@manansuri/a-dummys-guide-to-word2vec-456444f3c673)
